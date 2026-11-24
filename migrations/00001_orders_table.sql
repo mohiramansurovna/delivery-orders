@@ -10,10 +10,11 @@ CREATE TABLE orders (
     delivery_address TEXT         NOT NULL,
     created_at       TIMESTAMPTZ  NOT NULL DEFAULT now(),
     updated_at       TIMESTAMPTZ  NOT NULL DEFAULT now(),
-)
+    
     CONSTRAINT orders_items_is_array CHECK (jsonb_typeof(items) = 'array'),
     CONSTRAINT orders_status_valid CHECK (status IN
     ('pending', 'confirmed', 'preparing', 'ready', 'delivering', 'delivered', 'cancelled'))
+);
 
 CREATE INDEX idx_orders_customer_id ON orders (customer_id);
 -- +goose StatementEnd
