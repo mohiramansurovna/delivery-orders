@@ -26,8 +26,6 @@ type RequestedItem struct {
 	Quantity int64
 }
 
-// validCurrency reports whether c looks like an ISO 4217 code: exactly three
-// uppercase ASCII letters.
 func validCurrency(c string) bool {
 	if len(c) != 3 {
 		return false
@@ -62,9 +60,9 @@ func NewOrder(
 	orderItems := make([]OrderItem, 0, len(requested))
 	for _, req := range requested {
 
-		//remove dublicates
+		//throw on dublicates
 		if _, exists := seenItems[req.ItemID]; exists {
-			continue
+			return Order{}, ErrInvalidOrder
 		}
 		seenItems[req.ItemID] = struct{}{}
 
