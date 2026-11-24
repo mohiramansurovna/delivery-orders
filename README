@@ -1,0 +1,31 @@
+internal/
+├── application/
+│   └── orders/
+│       ├── create_order.go
+│       ├── cancel_order.go
+│       └── get_order.go
+│
+├── core/
+│   └── orders/
+│       ├── order.go
+│       ├── order_item.go
+│       ├── order.repository.go
+│       ├── items.provider.go
+│       ├── status.go
+│       └── errors.go
+│
+└── infrastructure/
+    ├── repositories/
+    │   └── order.repository.go
+    └── providers/
+        └── items.provider.go
+
+
+ITEMS_SERVICE_URL=http://localhost:9000/items
+
+req GET ITEMS_SERVICE_URL?ids=1,2,3
+res.json []{
+    id int64, 
+    quantity int64, //means how much left in stock
+    unit_price int64
+}
