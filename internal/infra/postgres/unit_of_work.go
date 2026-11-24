@@ -15,7 +15,7 @@ func NewUnitOfWork(pool *pgxpool.Pool) *UnitOfWork {
 	return &UnitOfWork{pool: pool}
 }
 
-//should have returning, also, will it rollback after commit? shouln't pg throw in that case
+// should have returning, also, will it rollback after commit? shouln't pg throw in that case
 func (uow *UnitOfWork) Execute(ctx context.Context, callback func(pgx.Tx) error) error {
 	tx, err := uow.pool.Begin(ctx)
 	if err != nil {
