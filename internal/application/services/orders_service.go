@@ -24,17 +24,17 @@ type CreateOrderArgs struct {
 	DeliveryAddress string
 }
 
-func (this *OrdersService) CreateOrder(ctx context.Context, args CreateOrderArgs) (order.Order, error) {
+func (this *OrdersService) Create(ctx context.Context, args CreateOrderArgs) (order.Order, error) {
 	if len(args.Items) == 0 {
 		return order.Order{}, order.ErrInvalidOrder
 	}
 
-	ids := make([]string, 0, len(args.Items))
+	IDs := make([]string, 0, len(args.Items))
 	for _, it := range args.Items {
-		ids = append(ids, strconv.FormatInt(it.ItemID, 10))
+		IDs = append(IDs, strconv.FormatInt(it.ItemID, 10))
 	}
 
-	items, err := this.itemsProvider.GetByIDs(ctx, ids)
+	items, err := this.itemsProvider.GetByIDs(ctx, IDs)
 	if err != nil {
 		return order.Order{}, fmt.Errorf("get items: %w", err)
 	}
@@ -55,4 +55,8 @@ func (this *OrdersService) CreateOrder(ctx context.Context, args CreateOrderArgs
 		return order.Order{}, fmt.Errorf("create order: %w", err)
 	}
 	return persistend, nil
+}
+
+func (this *OrdersService) GetByID(ctx context.Context, ID int64) (order.Order, error) {
+	return this.ordersRepository.GetByID(ctx, ID)
 }

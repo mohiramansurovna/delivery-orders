@@ -35,7 +35,7 @@ func main() {
 	ordersController := controllers.NewOrdersController(ordersService)
 
 	srv := &http.Server{
-		Addr:              ":8080",
+		Addr:              os.Getenv("HTTP_ADDR"),
 		Handler:           httpapi.NewRouter(pool, ordersController),
 		ReadHeaderTimeout: 5 * time.Second,
 	}

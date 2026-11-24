@@ -42,6 +42,8 @@ func handle(w http.ResponseWriter, err error) {
 		httpapiutil.WriteError(w, http.StatusUnprocessableEntity, err.Error())
 	case errors.Is(err, order.ErrInsufficientStock):
 		httpapiutil.WriteError(w, http.StatusConflict, err.Error())
+	case errors.Is(err, order.ErrNotFound):
+		httpapiutil.WriteError(w, http.StatusNotFound, err.Error())
 	default:
 		log.Printf("unexpected error: %v", err) // details only in logs
 		httpapiutil.WriteError(w, http.StatusInternalServerError, "internal error")

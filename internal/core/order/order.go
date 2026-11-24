@@ -22,8 +22,8 @@ type Order struct {
 }
 
 type RequestedItem struct {
-	ItemID   int64 `json:"item_id"`
-	Quantity int64 `json:"quantity"`
+	ItemID   int64
+	Quantity int64
 }
 
 func NewOrder(

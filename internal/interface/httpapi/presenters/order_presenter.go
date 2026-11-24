@@ -21,6 +21,7 @@ type OrderView struct {
 	TotalAmount     int64           `json:"total_amount"`
 	DeliveryAddress string          `json:"delivery_address"`
 	CreatedAt       time.Time       `json:"created_at"`
+	UpdatedAt       time.Time       `json:"updated_at"`
 }
 
 func PresentOrder(o order.Order) OrderView {
@@ -41,5 +42,6 @@ func PresentOrder(o order.Order) OrderView {
 		TotalAmount:     o.TotalAmount,
 		DeliveryAddress: o.DeliveryAddress,
 		CreatedAt:       o.CreatedAt,
+		UpdatedAt:       o.UpdatedAt,
 	}
 }
