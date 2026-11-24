@@ -9,5 +9,5 @@ type Item struct {
 }
 
 type ItemsProvider interface {
-	GetByIDs(ctx context.Context, ids []string) ([]Item, error)
+	GetByIDs(ctx context.Context, ids []int64) ([]Item, error)
 }

@@ -26,6 +26,20 @@ type RequestedItem struct {
 	Quantity int64
 }
 
+// validCurrency reports whether c looks like an ISO 4217 code: exactly three
+// uppercase ASCII letters.
+func validCurrency(c string) bool {
+	if len(c) != 3 {
+		return false
+	}
+	for i := 0; i < 3; i++ {
+		if c[i] < 'A' || c[i] > 'Z' {
+			return false
+		}
+	}
+	return true
+}
+
 func NewOrder(
 	customerID int64,
 	currency string,
@@ -33,7 +47,7 @@ func NewOrder(
 	items []Item,
 	deliveryAddress string,
 ) (Order, error) {
-	if customerID <= 0 || len(currency) != 3 || deliveryAddress == "" || len(requested) == 0 {
+	if customerID <= 0 || !validCurrency(currency) || deliveryAddress == "" || len(requested) == 0 {
 		return Order{}, ErrInvalidOrder
 	}
 
@@ -42,28 +56,34 @@ func NewOrder(
 		itemsMap[item.ID] = item
 	}
 
+	seenItems := make(map[int64]struct{}, len(requested))
+
+	var total int64
 	orderItems := make([]OrderItem, 0, len(requested))
 	for _, req := range requested {
+
+		//remove dublicates
+		if _, exists := seenItems[req.ItemID]; exists {
+			continue
+		}
+		seenItems[req.ItemID] = struct{}{}
+
 		item, ok := itemsMap[req.ItemID]
 		if !ok {
 			return Order{}, ErrItemNotFound
 		}
-		if item.Stock < req.Quantity {
+		if req.Quantity <= 0 {
+			return Order{}, ErrInvalidOrder
+		}
+		if item.Stock < req.Quantity { //QUESTION: will i somehow lock stock for concurrency?
 			return Order{}, ErrInsufficientStock
 		}
+		total += item.UnitPrice * req.Quantity
 		orderItems = append(orderItems, OrderItem{
-			ID:        item.ID,
+			ItemID:    item.ID,
 			Quantity:  req.Quantity,
 			UnitPrice: item.UnitPrice,
 		})
-	}
-
-	var total int64
-	for _, it := range orderItems {
-		if it.Quantity <= 0 || it.UnitPrice < 0 {
-			return Order{}, ErrInvalidOrder
-		}
-		total += it.UnitPrice * it.Quantity
 	}
 
 	return Order{

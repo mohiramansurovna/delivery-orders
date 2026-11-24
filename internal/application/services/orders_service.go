@@ -3,7 +3,6 @@ package services
 import (
 	"context"
 	"fmt"
-	"strconv"
 
 	"github.com/mohiramansurovna/orders/internal/core/order"
 )
@@ -25,13 +24,9 @@ type CreateOrderArgs struct {
 }
 
 func (this *OrdersService) Create(ctx context.Context, args CreateOrderArgs) (order.Order, error) {
-	if len(args.Items) == 0 {
-		return order.Order{}, order.ErrInvalidOrder
-	}
-
-	IDs := make([]string, 0, len(args.Items))
+	IDs := make([]int64, 0, len(args.Items))
 	for _, it := range args.Items {
-		IDs = append(IDs, strconv.FormatInt(it.ItemID, 10))
+		IDs = append(IDs, it.ItemID)
 	}
 
 	items, err := this.itemsProvider.GetByIDs(ctx, IDs)

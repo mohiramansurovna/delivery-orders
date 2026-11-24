@@ -28,7 +28,7 @@ func PresentOrder(o order.Order) OrderView {
 	items := make([]OrderItemView, 0, len(o.Items))
 	for _, it := range o.Items {
 		items = append(items, OrderItemView{
-			ItemID:    it.ID,
+			ItemID:    it.ItemID,
 			Quantity:  it.Quantity,
 			UnitPrice: it.UnitPrice,
 		})

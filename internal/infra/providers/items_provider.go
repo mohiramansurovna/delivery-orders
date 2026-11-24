@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strconv"
 	"strings"
 	"time"
 
@@ -43,12 +44,16 @@ func toItem(dto []itemDTO) []order.Item {
 	return orderItems
 }
 
-func (p *ItemsProvider) GetByIDs(ctx context.Context, ids []string) ([]order.Item, error) {
+func (p *ItemsProvider) GetByIDs(ctx context.Context, ids []int64) ([]order.Item, error) {
 	if len(ids) == 0 {
 		return nil, fmt.Errorf("no item ids in getByIDs")
 	}
 
-	url := fmt.Sprintf("%s?ids=%s", p.baseURL, strings.Join(ids, ","))
+	stringIds := make([]string, len(ids))
+	for _, id := range ids {
+		stringIds = append(stringIds, strconv.FormatInt(id, 10))
+	}
+	url := fmt.Sprintf("%s?ids=%s", p.baseURL, strings.Join(stringIds, ","))
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
 	if err != nil {
@@ -57,16 +62,16 @@ func (p *ItemsProvider) GetByIDs(ctx context.Context, ids []string) ([]order.Ite
 
 	res, err := p.client.Do(req)
 	if err != nil {
-		return nil, fmt.Errorf("call items service: %w", err)
+		return nil, fmt.Errorf("%w: call items service: %v", order.ErrItemsUnavailable, err)
 	}
 	defer res.Body.Close() //QUESTION: why do i need it?
 	if res.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("items service returned status %d", res.StatusCode)
+		return nil, fmt.Errorf("%w: items service returned status %d", order.ErrItemsUnavailable, res.StatusCode)
 	}
 
 	var dbItems []itemDTO
 	if err := json.NewDecoder(res.Body).Decode(&dbItems); err != nil {
-		return nil, fmt.Errorf("decode items response: %w", err)
+		return nil, fmt.Errorf("%w: decode items response: %v", order.ErrItemsUnavailable, err)
 	}
 
 	return toItem(dbItems), nil
